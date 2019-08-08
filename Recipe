@@ -1,7 +1,10 @@
 import requests as req
+import json
+
 key = '7677d15b46f945889766785a5ac748c5'
 ingredients = []
 count = 0
+##Compiling list of ingredients
 while True:
     ingredient = input("Enter all the ingredients you have, then type 'done': ")
     if ingredient.upper() == 'DONE':
@@ -12,10 +15,29 @@ while True:
         
 url = "https://api.spoonacular.com/recipes/findByIngredients?ingredients=" + ingredients[0]
 for i in range(1, count):
-    url = url + ",+" + ingredients[i]
+    url = url + ",+" + ingredients[i] ## adding additional ingredients onto the url
 
-url = url + '&apiKey=' + key
+url = url + '&apiKey=' + key ##API key required to use
 resp = req.get(url)
 if resp.ok:
     recipes = resp.json()
-print(recipes)
+
+i = 1 ##for indexing
+for recipe in recipes:
+    print("%d. %s\nNumber of missing ingredients: %d" % (i, recipe['title'],recipe['missedIngredientCount']))
+    i += 1
+    
+choice = int(input("Pick the number of the recipe you would like to see: "))
+iD = recipes[choice-1]['id'] 
+
+##Getting information on ingredients from API
+url = "https://api.spoonacular.com/recipes/" + str(iD) + "/information?"
+url = url + '&apiKey=' + key
+resp = req.get(url)
+if resp.ok:
+    ingredients = resp.json()
+
+
+##giving user link to recipe
+print("\n\n" + ingredients['title'] + "\nLink: " + ingredients['sourceUrl'])
+
